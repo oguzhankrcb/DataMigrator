@@ -51,4 +51,34 @@ class DataMigrator
 
         return $toModel;
     }
+
+    public function transferAllDataFromModelToModel(
+        string $transferToModel,
+        BasePropertyDefiner|array $toModelPrototype,
+        string $transferFromModel
+    ) {
+        if (! class_exists($transferFromModel)) {
+            throw new ClassNotFoundException($transferFromModel);
+        }
+
+        if (! class_exists($transferToModel)) {
+            throw new ClassNotFoundException($transferToModel);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $queryAllDataFromFromModel = $transferFromModel::all()->toArray();
+            foreach ($queryAllDataFromFromModel as $model) {
+                $toModel = $this->transformData($toModelPrototype, $model);
+
+                $transferToModel::create($toModel);
+            }
+
+            DB::commit();
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw new Exception($e->getMessage());
+        }
+    }
 }
