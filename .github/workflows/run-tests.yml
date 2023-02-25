@@ -13,11 +13,30 @@ jobs:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest ]
-        php: [ 8.2, 8.1 ]
+        php: [ 8.2, 8.1, 8.0 ]
         laravel: [ 9.*, 10.* ]
         stability: [ prefer-lowest, prefer-stable ]
+        include:
+          - laravel: 10.*
+            testbench: 8.*
+          - laravel: 9.*
+            testbench: 7.*
+        exclude:
+          - laravel: 10.*
+            php: 8.0
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_USER: user
+          MYSQL_PASSWORD: secret
+          MYSQL_DATABASE: test-db
+          MYSQL_ROOT_PASSWORD: secretroot
+        ports:
+          - 3306
 
     steps:
       - name: Checkout code
@@ -37,7 +56,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
@@ -45,3 +64,8 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit
+        env:
+          DB_USERNAME: user
+          DB_PASSWORD: secret
+          DB_DATABASE: test-db
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
