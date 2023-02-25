@@ -31,10 +31,10 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_USER: user
-          MYSQL_PASSWORD: secret
-          MYSQL_DATABASE: test-db
-          MYSQL_ROOT_PASSWORD: secretroot
+          MYSQL_USER: root
+          MYSQL_PASSWORD:
+          MYSQL_DATABASE: data-migrator.testing
+          MYSQL_ROOT_PASSWORD:
         ports:
           - 3306
 
@@ -65,7 +65,7 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit
         env:
-          DB_USERNAME: user
-          DB_PASSWORD: secret
-          DB_DATABASE: test-db
+          DB_USERNAME: root
+          DB_PASSWORD:
+          DB_DATABASE: data-migrator.testing
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
