@@ -3,6 +3,7 @@
 namespace Oguzhankrcb\DataMigrator\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 use Oguzhankrcb\DataMigrator\DataMigratorServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
@@ -21,5 +22,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected function getPackageProviders($app): array
     {
         return [DataMigratorServiceProvider::class];
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        Schema::dropAllTables();
     }
 }
