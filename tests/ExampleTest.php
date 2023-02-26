@@ -2,12 +2,11 @@
 
 namespace Oguzhankrcb\DataMigrator\Tests;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Oguzhankrcb\DataMigrator\Tests\Models\ModelA;
 
 class ExampleTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseData;
 
     public function test_example()
     {
