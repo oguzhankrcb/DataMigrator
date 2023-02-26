@@ -18,14 +18,14 @@
     "require": {
         "php": "^8.0|^8.1|^8.2",
         "spatie/laravel-package-tools": "^1.14.0",
-        "illuminate/contracts": "8.*|9.*|^10.0",
-        "illuminate/support": "8.*|9.*|^10.0",
-        "illuminate/database": "8.*|9.*|^10.0"
+        "illuminate/contracts": "^8.0|^9.0|^10.0",
+        "illuminate/support": "^8.0|^9.0|^10.0",
+        "illuminate/database": "^8.0|^9.0|^10.0"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^6.4",
-        "phpunit/phpunit": "9.*|^10.0",
+        "phpunit/phpunit": "^9.6.1",
         "orchestra/testbench": "^7.21|^8.0"
     },
     "autoload": {
