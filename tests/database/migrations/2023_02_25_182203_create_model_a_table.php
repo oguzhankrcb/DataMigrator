@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('model_a_s', function (Blueprint $table) {
             $table->id();
+            $table->string('unique_key');
             $table->json('data');
             $table->timestamps();
         });
