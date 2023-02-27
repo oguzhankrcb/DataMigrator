@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('model_b_s', function (Blueprint $table) {
             $table->id();
+            $table->string('new_key')->nullable();
             $table->string('name');
             $table->string('category');
             $table->string('alias');
