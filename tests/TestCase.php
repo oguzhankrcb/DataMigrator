@@ -3,11 +3,14 @@
 namespace Oguzhankrcb\DataMigrator\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Schema;
 use Oguzhankrcb\DataMigrator\DataMigratorServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
+    use WithFaker;
+
     public function setUp(): void
     {
         parent::setUp();
