@@ -4,7 +4,6 @@ namespace Oguzhankrcb\DataMigrator;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Oguzhankrcb\DataMigrator\Commands\DataMigratorCommand;
 
 class DataMigratorServiceProvider extends PackageServiceProvider
 {

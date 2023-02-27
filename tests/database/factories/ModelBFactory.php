@@ -20,12 +20,12 @@ class ModelBFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'      => $this->faker->name,
-            'category'  => $this->faker->word(),
-            'alias'     => $this->faker->word(),
+            'name' => $this->faker->name,
+            'category' => $this->faker->word(),
+            'alias' => $this->faker->word(),
             'item_code' => $this->faker->numerify('999####'),
-            'vat'       => $this->faker->numberBetween(0, 18),
-            'status'    => $this->faker->boolean,
+            'vat' => $this->faker->numberBetween(0, 18),
+            'status' => $this->faker->boolean,
         ];
     }
 }
