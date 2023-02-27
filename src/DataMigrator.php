@@ -4,22 +4,26 @@ namespace Oguzhankrcb\DataMigrator;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Oguzhankrcb\DataMigrator\Concerns\BasePropertyDefiner;
 use Oguzhankrcb\DataMigrator\Exceptions\ClassNotFoundException;
+use Oguzhankrcb\DataMigrator\Exceptions\KeyNotFoundException;
+use Oguzhankrcb\DataMigrator\Traits\FieldTokenizer;
 use Throwable;
 
 class DataMigrator
 {
-    public function transformData(BasePropertyDefiner|array $toModelPrototype, BasePropertyDefiner|array $fromModel)
+    use FieldTokenizer;
+
+    /**
+     * @return array
+     *
+     * @throws \Oguzhankrcb\DataMigrator\Exceptions\KeyNotFoundException
+     *
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transforms_data_with_concatenate_keys()
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transforms_data_with_nested_keys()
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transforms_data_with_static_keys()
+     */
+    public function transformData(array $toModelPrototype, array $fromModel)
     {
-        if ($toModelPrototype instanceof BasePropertyDefiner) {
-            $toModelPrototype = $toModelPrototype->getProperty();
-        }
-
-        if ($fromModel instanceof BasePropertyDefiner) {
-            $fromModel = $fromModel->getProperty();
-        }
-
         $toModel = [];
 
         foreach ($toModelPrototype as $newField => $fromField) {
@@ -29,37 +33,69 @@ class DataMigrator
                 continue;
             }
 
-            $fromFieldParts = explode('->', $fromField);
-            $fromValue = $fromModel;
-            foreach ($fromFieldParts as $part) {
-                if (strpos($part, '.') !== false) {
-                    $nestedParts = explode('.', $part);
-                    $nestedValue = '';
-                    foreach ($nestedParts as $nestedPart) {
-                        if (! isset($fromValue[$nestedPart])) {
-                            throw new Exception("$nestedPart key not found in the model.");
-                        }
-                        $nestedValue .= $fromValue[$nestedPart];
+            $fieldParts = $this->tokenizeField($fromField);
+
+            foreach ($fieldParts as $fieldValue) {
+                $fromValue = $fromModel;
+
+                if (strpos($fieldValue, '.') === false && strpos($fieldValue, '->') === false) {
+                    if (isset($toModel[$newField])) {
+                        $toModel[$newField] .= $fromValue[$fieldValue] ?? $fieldValue;
+                    } else {
+                        $toModel[$newField] = $fromValue[$fieldValue] ?? $fieldValue;
                     }
-                    $fromValue = $nestedValue;
 
                     continue;
                 }
 
-                if (! isset($fromValue[$part])) {
-                    throw new Exception("$part key not found in the model.");
+                $fromFieldParts = explode('->', $fieldValue);
+                foreach ($fromFieldParts as $part) {
+                    if (strpos($part, '.') !== false) {
+                        $nestedParts = explode('.', $part);
+                        $nestedValue = '';
+                        foreach ($nestedParts as $nestedPart) {
+                            if (! isset($fromValue[$nestedPart])) {
+                                throw new KeyNotFoundException($nestedPart);
+                            }
+                            $nestedValue .= $fromValue[$nestedPart];
+                        }
+                        $fromValue = $nestedValue;
+
+                        continue;
+                    }
+
+                    if (! isset($fromValue[$part])) {
+                        throw new KeyNotFoundException($part);
+                    }
+
+                    $fromValue = $fromValue[$part];
                 }
-                $fromValue = $fromValue[$part];
+
+                if ($fromValue !== null && $fromValue !== '') {
+                    if (isset($toModel[$newField])) {
+                        $toModel[$newField] .= $fromValue;
+                    } else {
+                        $toModel[$newField] = $fromValue;
+                    }
+                }
             }
-            $toModel[$newField] = $fromValue;
         }
 
         return $toModel;
     }
 
+    /**
+     * @return void
+     *
+     * @throws \Oguzhankrcb\DataMigrator\Exceptions\ClassNotFoundException
+     *
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_all_data_from_model_to_model_with_concatenate_keys()
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_all_data_from_model_to_model_with_nested_keys()
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_all_data_from_model_to_model_with_static_keys()
+     */
     public function transferAllDataFromModelToModel(
         string $transferToModel,
-        BasePropertyDefiner|array $toModelPrototype,
+        array $toModelPrototype,
         string $transferFromModel
     ) {
         if (! class_exists($transferFromModel)) {
