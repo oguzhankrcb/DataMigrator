@@ -20,13 +20,14 @@ class ModelAFactory extends Factory
     public function definition(): array
     {
         return [
-            'data' => [
-                'name' => $this->faker->name,
+            'unique_key' => $this->faker->shuffleString('abcdefghijklmn'),
+            'data'       => [
+                'name'     => $this->faker->name,
                 'category' => $this->faker->word(),
-                'alias' => $this->faker->word(),
-                'item_code' => $this->faker->numerify('999####'),
-                'vat' => $this->faker->numberBetween(0, 18),
-                'status' => $this->faker->boolean,
+                'alias'    => $this->faker->word(),
+                'item'     => ['code' => $this->faker->numerify('999####')],
+                'vat'      => $this->faker->numberBetween(0, 18),
+                'status'   => $this->faker->boolean,
             ],
         ];
     }
