@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/7572058/221652020-d56561fa-fe0a-466c-a02c-0dbfb2c1e6a4.jpeg"/>
+<img src="https://user-images.githubusercontent.com/7572058/221666178-3157c1b8-fd83-48e8-956c-ec63dbcbead5.jpeg"/>
 
 # A simple package for data migration
 
