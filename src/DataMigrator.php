@@ -85,8 +85,41 @@ class DataMigrator
     }
 
     /**
-     * @return void
+     * @throws \Oguzhankrcb\DataMigrator\Exceptions\ClassNotFoundException
      *
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_data_from_model_to_model_with_concatenate_keys()
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_data_from_model_to_model_with_nested_keys()
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_data_from_model_to_model_with_static_keys()
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_throws_exception_while_transfering_data_from_model_to_model_with_empty_model()
+     */
+    public function transferDataModelToModel(
+        string $transferToModel,
+        array $toModelPrototype,
+        Model|array $transferFromModel
+    ): Model|null {
+        if (! class_exists($transferToModel)) {
+            throw new ClassNotFoundException($transferToModel);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if ($transferFromModel instanceof Model) {
+                $transferFromModel = $transferFromModel->toArray();
+            }
+
+            $toModel = $this->transformData($toModelPrototype, $transferFromModel);
+
+            $createdModel = $transferToModel::create($toModel);
+
+            DB::commit();
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw new Exception($e->getMessage());
+        }
+
+        return $createdModel;
+    }
      * @throws \Oguzhankrcb\DataMigrator\Exceptions\ClassNotFoundException
      *
      * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_all_data_from_model_to_model_with_concatenate_keys()
