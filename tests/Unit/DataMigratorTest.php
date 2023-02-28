@@ -168,7 +168,168 @@ class DataMigratorTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transferDataModelToModel()
+     */
+    public function it_transfers_data_from_model_to_model_with_nested_keys(): void
+    {
+        // 1️⃣ Arrange 🏗
+        $model_a_s = ModelA::factory(random_int(5, 10))->create();
+
+        $randomInstance = $model_a_s->random()->first();
+
+        $toModelPrototype = [
+            'id'        => '[id]',
+            'name'      => '[data->name]',
+            'category'  => '[data->category]',
+            'alias'     => '[data->alias]',
+            'item_code' => '[data->item->code]',
+            'vat'       => '[data->vat]',
+            'status'    => '[data->status]',
+        ];
+
+        // 2️⃣ Act 🏋🏻‍
+        DataMigrator::transferDataModelToModel(
+            transferToModel: ModelB::class,
+            toModelPrototype: $toModelPrototype,
+            transferFromModel: $randomInstance);
+
+        // 3️⃣ Assert ✅
+        $this->assertDatabaseCount(ModelB::class, 1);
+
+        $this->assertDatabaseHas(ModelB::class, [
+            'id'        => $randomInstance->id,
+            'name'      => $randomInstance->data['name'],
+            'category'  => $randomInstance->data['category'],
+            'alias'     => $randomInstance->data['alias'],
+            'item_code' => $randomInstance->data['item']['code'],
+            'vat'       => $randomInstance->data['vat'],
+            'status'    => $randomInstance->data['status'],
+        ]);
+    }
+
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transferDataModelToModel()
+     */
+    public function it_transfers_data_from_model_to_model_with_concatenate_keys(): void
+    {
+        // 1️⃣ Arrange 🏗
+        $model_a_s = ModelA::factory(random_int(5, 10))->create();
+
+        $randomInstance = $model_a_s->random()->first();
+
+        $toModelPrototype = [
+            'id'        => '[id]',
+            'new_key'   => '[id]_[unique_key]',
+            'name'      => '[data->name]',
+            'category'  => '[data->category]',
+            'alias'     => '[data->alias]',
+            'item_code' => '[data->item->code]',
+            'vat'       => '[data->vat]',
+            'status'    => '[data->status]',
+        ];
+
+        // 2️⃣ Act 🏋🏻‍
+        DataMigrator::transferDataModelToModel(
+            transferToModel: ModelB::class,
+            toModelPrototype: $toModelPrototype,
+            transferFromModel: $randomInstance);
+
+        // 3️⃣ Assert ✅
+        $this->assertDatabaseCount(ModelB::class, 1);
+
+        $this->assertDatabaseHas(ModelB::class, [
+            'id'        => $randomInstance->id,
+            'new_key'   => $randomInstance->id.'_'.$randomInstance->unique_key,
+            'name'      => $randomInstance->data['name'],
+            'category'  => $randomInstance->data['category'],
+            'alias'     => $randomInstance->data['alias'],
+            'item_code' => $randomInstance->data['item']['code'],
+            'vat'       => $randomInstance->data['vat'],
+            'status'    => $randomInstance->data['status'],
+        ]);
+    }
+
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transferDataModelToModel()
+     */
+    public function it_transfers_data_from_model_to_model_with_static_keys(): void
+    {
+        // 1️⃣ Arrange 🏗
+        $model_a_s = ModelA::factory(random_int(5, 10))->create();
+
+        $randomInstance = $model_a_s->random()->first();
+
+        $toModelPrototype = [
+            'id'        => '[id]',
+            'new_key'   => '[id]_[unique_key]',
+            'name'      => '[data->name]',
+            'category'  => '[data->category]',
+            'alias'     => '[data->alias]',
+            'item_code' => '[data->item->code]',
+            'vat'       => $randomVat = $this->faker->numberBetween(0, 18),
+            'status'    => '[data->status]',
+        ];
+
+        // 2️⃣ Act 🏋🏻‍
+        DataMigrator::transferDataModelToModel(
+            transferToModel: ModelB::class,
+            toModelPrototype: $toModelPrototype,
+            transferFromModel: $randomInstance);
+
+        // 3️⃣ Assert ✅
+        $this->assertDatabaseCount(ModelB::class, 1);
+
+        $this->assertDatabaseHas(ModelB::class, [
+            'id'        => $randomInstance->id,
+            'new_key'   => $randomInstance->id.'_'.$randomInstance->unique_key,
+            'name'      => $randomInstance->data['name'],
+            'category'  => $randomInstance->data['category'],
+            'alias'     => $randomInstance->data['alias'],
+            'item_code' => $randomInstance->data['item']['code'],
+            'vat'       => $randomVat,
+            'status'    => $randomInstance->data['status'],
+        ]);
+    }
+
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transferDataModelToModel()
+     */
+    public function it_throws_exception_while_transfering_data_from_model_to_model_with_empty_model(): void
+    {
+        // 1️⃣ Arrange 🏗
+        ModelA::factory(random_int(5, 10))->create();
+
+        $toModelPrototype = [
+            'id'        => '[id]',
+            'new_key'   => '[id]_[unique_key]',
+            'name'      => '[data->name]',
+            'category'  => '[data->category]',
+            'alias'     => '[data->alias]',
+            'item_code' => '[data->item->code]',
+            'vat'       => $this->faker->numberBetween(0, 18),
+            'status'    => '[data->status]',
+        ];
+
+        $this->expectException(Exception::class);
+
+        // 2️⃣ Act 🏋🏻‍
+        DataMigrator::transferDataModelToModel(
+            transferToModel: ModelB::class,
+            toModelPrototype: $toModelPrototype,
+            transferFromModel: []);
+
+        // 3️⃣ Assert ✅
+        $this->assertDatabaseCount(ModelB::class, 0);
+    }
     public function it_transfers_all_data_from_model_to_model_with_nested_keys(): void
     {
         // 1️⃣ Arrange 🏗
