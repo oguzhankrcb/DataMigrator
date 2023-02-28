@@ -446,4 +446,37 @@ class DataMigratorTest extends TestCase
             ]);
         });
     }
+
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transferAllDataFromModelToModel()
+     */
+    public function it_throws_exception_while_transfering_all_data_from_model_to_model_with_empty_model(): void
+    {
+        // 1️⃣ Arrange 🏗
+        ModelA::factory(random_int(5, 10))->create();
+
+        $toModelPrototype = [
+            'id'        => '[id_not_exists]',
+            'new_key'   => '[id]_[unique_key]',
+            'name'      => '[data->name]',
+            'category'  => '[data->category]',
+            'alias'     => '[data->alias]',
+            'item_code' => '[data->item->code]',
+            'vat'       => $this->faker->numberBetween(0, 18),
+            'status'    => '[data->status]',
+        ];
+
+        $this->expectException(Exception::class);
+
+        // 2️⃣ Act 🏋🏻‍
+        DataMigrator::transferAllDataFromModelToModel(
+            transferToModel: ModelB::class,
+            toModelPrototype: $toModelPrototype,
+            transferFromModel: ModelA::class);
+
+        // 3️⃣ Assert ✅
+        $this->assertDatabaseCount(ModelB::class, 0);
+    }
 }
