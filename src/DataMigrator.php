@@ -3,6 +3,7 @@
 namespace Oguzhankrcb\DataMigrator;
 
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Oguzhankrcb\DataMigrator\Exceptions\ClassNotFoundException;
 use Oguzhankrcb\DataMigrator\Exceptions\KeyNotFoundException;
@@ -14,15 +15,13 @@ class DataMigrator
     use FieldTokenizer;
 
     /**
-     * @return array
-     *
      * @throws \Oguzhankrcb\DataMigrator\Exceptions\KeyNotFoundException
      *
      * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transforms_data_with_concatenate_keys()
      * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transforms_data_with_nested_keys()
      * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transforms_data_with_static_keys()
      */
-    public function transformData(array $toModelPrototype, array $fromModel)
+    public function transformData(array $toModelPrototype, array $fromModel): array
     {
         $toModel = [];
 
@@ -120,17 +119,20 @@ class DataMigrator
 
         return $createdModel;
     }
+
+    /**
      * @throws \Oguzhankrcb\DataMigrator\Exceptions\ClassNotFoundException
      *
      * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_all_data_from_model_to_model_with_concatenate_keys()
      * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_all_data_from_model_to_model_with_nested_keys()
      * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_transfers_all_data_from_model_to_model_with_static_keys()
+     * @see \Oguzhankrcb\DataMigrator\Tests\Unit\DataMigratorTest::it_throws_exception_while_transfering_all_data_from_model_to_model_with_empty_model()
      */
     public function transferAllDataFromModelToModel(
         string $transferToModel,
         array $toModelPrototype,
         string $transferFromModel
-    ) {
+    ): void {
         if (! class_exists($transferFromModel)) {
             throw new ClassNotFoundException($transferFromModel);
         }
