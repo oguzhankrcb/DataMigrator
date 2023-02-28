@@ -2,6 +2,7 @@
 
 namespace Oguzhankrcb\DataMigrator\Tests\Unit;
 
+use Exception;
 use Oguzhankrcb\DataMigrator\Facades\DataMigrator;
 use Oguzhankrcb\DataMigrator\Tests\Models\ModelA;
 use Oguzhankrcb\DataMigrator\Tests\Models\ModelB;
@@ -9,7 +10,11 @@ use Oguzhankrcb\DataMigrator\Tests\TestCase;
 
 class DataMigratorTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transformData()
+     */
     public function it_transforms_data_with_all_type_of_keys(): void
     {
         // 1️⃣ Arrange 🏗
@@ -66,7 +71,11 @@ class DataMigratorTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transformData()
+     */
     public function it_transforms_data_with_nested_keys(): void
     {
         // 1️⃣ Arrange 🏗
@@ -119,7 +128,11 @@ class DataMigratorTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transformData()
+     */
     public function it_transforms_data_with_concatenate_keys(): void
     {
         // 1️⃣ Arrange 🏗
@@ -148,7 +161,11 @@ class DataMigratorTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transformData()
+     */
     public function it_transforms_data_with_static_keys(): void
     {
         // 1️⃣ Arrange 🏗
@@ -330,6 +347,12 @@ class DataMigratorTest extends TestCase
         // 3️⃣ Assert ✅
         $this->assertDatabaseCount(ModelB::class, 0);
     }
+
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transferAllDataFromModelToModel()
+     */
     public function it_transfers_all_data_from_model_to_model_with_nested_keys(): void
     {
         // 1️⃣ Arrange 🏗
@@ -367,7 +390,11 @@ class DataMigratorTest extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transferAllDataFromModelToModel()
+     */
     public function it_transfers_all_data_from_model_to_model_with_concatenate_keys(): void
     {
         // 1️⃣ Arrange 🏗
@@ -407,7 +434,11 @@ class DataMigratorTest extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     *
+     * @see \Oguzhankrcb\DataMigrator\Facades\DataMigrator::transferAllDataFromModelToModel()
+     */
     public function it_transfers_all_data_from_model_to_model_with_static_keys(): void
     {
         // 1️⃣ Arrange 🏗
