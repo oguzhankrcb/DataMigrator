@@ -150,6 +150,32 @@ This method will transfer all the data from the `Order` model to the `Invoice` m
 each
 `Order` model in the database.
 
+If you want to transfer only one model data to another model you can use `transferDataModelToModel` method
+only difference from the `transferAllDataFromModelToModel` method is this method only transfers one model not all
+models.
+
+Here's an example of how to use `transferDataModelToModel`:
+
+```php
+use App\Models\Order;
+use App\Models\Invoice;
+use Oguzhankrcb\DataMigrator\Facades\DataMigrator;
+
+// Define the fields to transfer from Order to Invoice
+$toModelPrototype = [
+    'invoice_number' => '[order_number]',
+    'customer_name' => '[customer->name]',
+    'customer_email' => '[customer->email]',
+    'total_amount' => '[amount]',
+    'total_amount_with_currency' => '[amount]€',
+];
+
+$orderInstance = Order::find(1);
+
+// Transfer the data from Order to Invoice
+$transferedModel = DataMigrator::transferDataModelToModel(Invoice::class, $toModelPrototype, $orderInstance);
+```
+
 ## Testing
 
 ```bash
