@@ -131,7 +131,8 @@ class DataMigrator
     public function transferAllDataFromModelToModel(
         string $transferToModel,
         array $toModelPrototype,
-        string $transferFromModel
+        string $transferFromModel,
+        int $chunkQuerySize = 1000
     ): void {
         if (! class_exists($transferFromModel)) {
             throw new ClassNotFoundException($transferFromModel);
@@ -144,12 +145,14 @@ class DataMigrator
         try {
             DB::beginTransaction();
 
-            $queryAllDataFromFromModel = $transferFromModel::all()->toArray();
-            foreach ($queryAllDataFromFromModel as $model) {
-                $toModel = $this->transformData($toModelPrototype, $model);
+            /** @var Model $transferFromModel */
+            $transferFromModel::query()->chunk($chunkQuerySize, function ($models) use ($toModelPrototype, $transferToModel) {
+                foreach ($models as $model) {
+                    $toModel = $this->transformData($toModelPrototype, $model->toArray());
 
-                $transferToModel::create($toModel);
-            }
+                    $transferToModel::create($toModel);
+                }
+            });
 
             DB::commit();
         } catch (Throwable $e) {
